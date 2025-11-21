@@ -18,7 +18,7 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
@@ -35,15 +35,15 @@ jobs:
       - name: Build & push backend image
         working-directory: backend
         run: |
-          BACKEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_REPO }}:latest
-          echo "Building backend: $BACKEND_IMAGE"
-          docker build -t $BACKEND_IMAGE .
-          docker push $BACKEND_IMAGE
+          IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_REPO }}:latest
+          echo "Building backend: $IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
 
       - name: Build & push frontend image
         working-directory: frontend
         run: |
-          FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPO }}:latest
-          echo "Building frontend: $FRONTEND_IMAGE"
-          docker build -t $FRONTEND_IMAGE .
-          docker push $FRONTEND_IMAGE
+          IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FRONTEND_REPO }}:latest
+          echo "Building frontend: $IMAGE"
+          docker build -t $IMAGE .
+          docker push $IMAGE
