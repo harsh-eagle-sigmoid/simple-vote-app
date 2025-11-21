@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: vote-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          # ECR image URL
+          image: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/vote-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
