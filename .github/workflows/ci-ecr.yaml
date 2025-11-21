@@ -1,4 +1,4 @@
-name: CI - Build & Push to ECR
+name: CI-CD - Build, Push, Deploy
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   ECR_FRONTEND_REPO: vote-frontend
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -47,3 +47,25 @@ jobs:
           echo "Building frontend: $IMAGE"
           docker build -t $IMAGE .
           docker push $IMAGE
+
+      - name: Set up kubeconfig
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG_DATA" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          kubectl config get-contexts || true
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/backend-service.yaml
+          kubectl apply -f k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/frontend-service.yaml
+
+          kubectl rollout status deployment/backend -n vote-app
+          kubectl rollout status deployment/frontend -n vote-app
