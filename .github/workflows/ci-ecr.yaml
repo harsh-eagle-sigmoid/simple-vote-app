@@ -48,15 +48,13 @@ jobs:
           docker build -t $IMAGE .
           docker push $IMAGE
 
-      - name: Set up kubeconfig
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      - name: Configure kubectl for EKS
         run: |
-          mkdir -p $HOME/.kube
-          printf "%s" "$KUBE_CONFIG" > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-          kubectl config get-contexts || true
-
+          aws eks update-kubeconfig --name vote-app-cluster --region ${{ env.AWS_REGION }}
+          echo "Current context:"
+          kubectl config current-context
+          echo "Cluster nodes:"
+          kubectl get nodes
 
       - name: Deploy to EKS
         run: |
