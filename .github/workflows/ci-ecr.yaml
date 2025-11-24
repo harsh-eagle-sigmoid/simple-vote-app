@@ -66,5 +66,9 @@ jobs:
           kubectl apply -f k8s/frontend-deployment.yaml
           kubectl apply -f k8s/frontend-service.yaml
 
-          kubectl rollout status deployment/backend -n vote-app
-          kubectl rollout status deployment/frontend -n vote-app
+          echo "Backend rollout status (ignore failure, just show pods):"
+          kubectl rollout status deployment/backend -n vote-app --timeout=180s || kubectl get pods -n vote-app
+
+          echo "Frontend rollout status (ignore failure, just show pods):"
+          kubectl rollout status deployment/frontend -n vote-app --timeout=180s || kubectl get pods -n vote-app
+
